@@ -2,7 +2,10 @@ import java.util.Scanner;
 
 public class UtilitiesPricingProgram {
 
-    private static int[] prices = new int[24];
+    private static int[] manualSource = new int[24];
+    private static int[] csvSource = manualSource;
+    private static String dataSourceChoice = "CSV";
+    private static int[] dataSet = csvSource;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -12,11 +15,19 @@ public class UtilitiesPricingProgram {
             int choice = menuSelection(sc);
             if (choice == 1) {
                 manualInput(sc);
+
             } else if (choice == 2) {
-                System.out.println("Inmatade elpriser:");
-                for (int i = 0; i < prices.length; i++) {
-                    System.out.printf("Kl %02d:00 - %02d:00: %d%n", i, (i + 1) % 24, prices[i]);
+                minMaxAverage(sc);
+
+            } else if (choice == 5) {
+                if (dataSourceChoice.equals("CSV")) {
+                    dataSourceChoice = "Manuell inmatning";
+                    dataSet = manualSource;
+                } else {
+                    dataSourceChoice = "CSV";
+                    dataSet = csvSource;
                 }
+
             } else if (choice == 'e') {
                 break;
             }
@@ -24,16 +35,23 @@ public class UtilitiesPricingProgram {
     }
 
     public static void displayMenu() {
+        String csvIndicator = dataSourceChoice.equals("CSV") ? "[X]" : "[]";
+        String manualIndicator = dataSourceChoice.equals("Manuell inmatning") ? "[X]" : "[]";
+
         System.out.println("====================================");
         System.out.println("Elpriskalkylatorn");
         System.out.println(
-                "Om du ej anger egna inmatningsvärden så kommer programmet att använda standardvärden. (CSV - filen för VG)");
+                "Om du ej anger egna inmatningsvärden så kommer programmet att använda standardvärden. (CSV-fil)");
+        System.out.println(
+                "Efter du matat in egna värden så måste du ändra vilken datakälla som skall användas (menyalternativ 5).");
         System.out.println("====================================");
         System.out.println("Var god välj ett alternativ:");
         System.out.println("1. Manuell inmatning av elpriser");
         System.out.println("2. Beräkna min, max och medelvärde av elpriser");
         System.out.println("3. Sortera elpriser");
         System.out.println("4. Beräkna bästa laddnigstid (4t)");
+        System.out.println("5. Ändra datakälla | Nu används: CSV-fil " + csvIndicator + " | Manuell inmatning "
+                + manualIndicator + " |");
         System.out.println("e. Avsluta programmet");
         System.out.println("====================================");
     }
@@ -43,6 +61,7 @@ public class UtilitiesPricingProgram {
         return scanner.nextInt();
     }
 
+    // RUN ON MENU CHOICE 1
     public static void manualInput(Scanner scanner) {
         System.out.println("====================================");
         System.out.println("Manuell inmatning av elpriser");
@@ -50,7 +69,8 @@ public class UtilitiesPricingProgram {
         System.out.println("Ange priset i hela ören (1.50kr anges således som 150)");
         System.out.println("====================================");
 
-        //this is needed to solve unwanted behavior of input.isEmpty() in the while loop
+        // this is needed to solve unwanted behavior of input.isEmpty() in the while
+        // loop
         if (scanner.hasNextLine()) {
             scanner.nextLine();
         }
@@ -68,7 +88,7 @@ public class UtilitiesPricingProgram {
                     if (price < 0) {
                         System.out.println("Kostnaden kan inte vara negativ. Försök igen.");
                     } else {
-                        prices[i] = price;
+                        manualSource[i] = price;
                         break;
                     }
                 } catch (NumberFormatException e) {
@@ -76,13 +96,36 @@ public class UtilitiesPricingProgram {
                 }
             }
         }
+        System.out.println("Tack! Tryck på Enter för att återgå till menyn.");
+        scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
+    }
 
-        System.out.println("Inmatade elpriser:");
-        for (int i = 0; i < prices.length; i++) {
-            System.out.printf("Kl %02d:00 - %02d:00: %d%n", i, (i + 1) % 24, prices[i]);
+    // RUN ON MENU CHOICE 2
+    public static void minMaxAverage(Scanner scanner) {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int sum = 0;
+
+        for (int price : dataSet) {
+            if (price < min) {
+                min = price;
+            }
+            if (price > max) {
+                max = price;
+            }
+            sum += price;
         }
 
-        System.out.println("Tack! Tryck på Enter för att återgå till menyn.");
+        double average = (double) sum / dataSet.length;
+
+        System.out.println("====================================");
+        System.out.println("Beräkning av min, max och medelvärde av elpriser");
+        System.out.println("Minsta elpris: " + min);
+        System.out.println("Högsta elpris: " + max);
+        System.out.println("Medelvärde: " + average);
+        System.out.println("====================================");
+        System.out.println("Tryck på Enter för att återgå till menyn.");
+        scanner.nextLine();
         scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
     }
 }
