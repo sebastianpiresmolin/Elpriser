@@ -4,5 +4,5 @@
 ### Clone repo ###
 ### Navigate to the ./src directory ###
 ### Run: ###
-javac UtilitiesPricingProgram.java
-java UtilitiesPricingProgram
+#### javac UtilitiesPricingProgram.java ####
+#### java UtilitiesPricingProgram ####
