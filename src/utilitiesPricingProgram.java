@@ -10,26 +10,25 @@ public class UtilitiesPricingProgram {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        while (true) {
+        OUTER: while (true) {
             displayMenu();
-            int choice = menuSelection(sc);
-            if (choice == 1) {
-                manualInput(sc);
-
-            } else if (choice == 2) {
-                minMaxAverage(sc);
-
-            } else if (choice == 5) {
-                if (dataSourceChoice.equals("CSV")) {
-                    dataSourceChoice = "Manuell inmatning";
-                    dataSet = manualSource;
-                } else {
-                    dataSourceChoice = "CSV";
-                    dataSet = csvSource;
-                }
-
-            } else if (choice == 'e') {
-                break;
+            int choice = menuSelection(sc); // row 57
+            if (choice == -1) {
+                System.out.println("Programmet avslutas.");
+                break; // Exit the loop
+            }
+            switch (choice) {
+                case 1:
+                    manualInput(sc); // row 73
+                    break;
+                case 2:
+                    minMaxAverage(sc); // row 112
+                    break;
+                case 5:
+                    dataSourceSelector(); // row 62
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -58,7 +57,21 @@ public class UtilitiesPricingProgram {
 
     public static int menuSelection(Scanner scanner) {
         System.out.print("Ange ditt val: ");
-        return scanner.nextInt();
+        String input = scanner.next();
+        if (input.equalsIgnoreCase("e")) {
+            return -1; // Return -1 if 'e' or 'E' is entered
+        }
+        return Integer.parseInt(input); // Parse the input as an integer
+    }
+
+    public static void dataSourceSelector() {
+        if (dataSourceChoice.equals("CSV")) {
+            dataSourceChoice = "Manuell inmatning";
+            dataSet = manualSource;
+        } else {
+            dataSourceChoice = "CSV";
+            dataSet = csvSource;
+        }
     }
 
     // RUN ON MENU CHOICE 1
