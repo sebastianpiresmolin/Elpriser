@@ -1,31 +1,45 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class UtilitiesPricingProgram {
 
     private static int[] manualSource = new int[24];
-    private static int[] csvSource = manualSource;
+    private static int[] csvSource;
     private static String dataSourceChoice = "CSV";
-    private static int[] dataSet = csvSource;
+    private static int[] dataSet;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
+        // Use an absolute path to the CSV file
+        String csvFilePath = System.getProperty("user.dir") + File.separator + "elpriser.csv";
+        csvSource = loadCsvData(csvFilePath);
+        dataSet = csvSource; // Update dataSet after loading CSV data
+
         OUTER: while (true) {
             displayMenu();
-            int choice = menuSelection(sc); // row 57
+            int choice = menuSelection(sc);
             if (choice == -1) {
                 System.out.println("Programmet avslutas.");
-                break; // Exit the loop
+                break; // Exit the program
             }
             switch (choice) {
                 case 1:
-                    manualInput(sc); // row 73
+                    manualInput(sc);
                     break;
                 case 2:
-                    minMaxAverage(sc); // row 112
+                    minMaxAverage(sc);
                     break;
                 case 5:
-                    dataSourceSelector(); // row 62
+                    dataSourceSelector();
+                    break;
+                case 6:
+                    printDataSet();
                     break;
                 default:
                     break;
@@ -51,6 +65,7 @@ public class UtilitiesPricingProgram {
         System.out.println("4. Beräkna bästa laddnigstid (4t)");
         System.out.println("5. Ändra datakälla | Nu används: CSV-fil " + csvIndicator + " | Manuell inmatning "
                 + manualIndicator + " |");
+        System.out.println("6. Skriv ut dataunderlag");
         System.out.println("e. Avsluta programmet");
         System.out.println("====================================");
     }
@@ -64,6 +79,51 @@ public class UtilitiesPricingProgram {
         return Integer.parseInt(input); // Parse the input as an integer
     }
 
+    private static int[] loadCsvData(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.err.println("File not found: " + filePath);
+            return new int[0];
+        }
+
+        List<Integer> prices = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(","); // i split the line by comma
+                if (parts.length == 2) {
+                    try {
+                        int price = Integer.parseInt(parts[1]);
+                        prices.add(price);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error parsing price: " + parts[1]);
+                    }
+                } else {
+                    System.err.println("Invalid line format: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int[] result = new int[prices.size()];
+        for (int i = 0; i < prices.size(); i++) {
+            result[i] = prices.get(i);
+        }
+        return result;
+    }
+
+    public static void printDataSet() {
+        if (dataSet == null || dataSet.length == 0) {
+            System.out.println("CSV data is not loaded or empty.");
+            return;
+        }
+        System.out.println("Dataunderlag:");
+        for (int i = 0; i < dataSet.length; i++) {
+            System.out.println("Klockan " + String.format("%02d", i) + "-" + String.format("%02d", (i + 1) % 24) + ": "
+                    + dataSet[i]);
+        }
+    }
+
     public static void dataSourceSelector() {
         if (dataSourceChoice.equals("CSV")) {
             dataSourceChoice = "Manuell inmatning";
@@ -72,6 +132,7 @@ public class UtilitiesPricingProgram {
             dataSourceChoice = "CSV";
             dataSet = csvSource;
         }
+        System.out.println("Dataunderlagg ändrades till: " + dataSourceChoice);
     }
 
     // RUN ON MENU CHOICE 1
@@ -84,6 +145,7 @@ public class UtilitiesPricingProgram {
 
         // this is needed to solve unwanted behavior of input.isEmpty() in the while
         // loop
+
         if (scanner.hasNextLine()) {
             scanner.nextLine();
         }
