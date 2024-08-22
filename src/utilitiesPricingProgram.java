@@ -43,7 +43,7 @@ public class UtilitiesPricingProgram {
                     findCheapestFourHourWindow(sc); // Row 238
                     break;
                 case 5:
-                    dataSourceSelector(); // Row 139
+                    dataSourceSelector(sc); // Row 139
                     break;
                 case 6:
                     printDataSet(sc); // Row 122
@@ -136,7 +136,7 @@ public class UtilitiesPricingProgram {
         scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
     }
 
-    public static void dataSourceSelector() {
+    public static void dataSourceSelector(Scanner scanner) {
         if (dataSourceChoice.equals("CSV")) {
             dataSourceChoice = "Manuell inmatning";
             dataSet = manualSource;
@@ -145,6 +145,10 @@ public class UtilitiesPricingProgram {
             dataSet = csvSource;
         }
         System.out.println("Dataunderlagg ändrades till: " + dataSourceChoice);
+        System.out.println("====================================");
+        System.out.println("Tryck på Enter för att återgå till menyn.");
+        scanner.nextLine();
+        scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
     }
 
     // RUN ON MENU CHOICE 1
