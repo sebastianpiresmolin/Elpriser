@@ -31,19 +31,22 @@ public class UtilitiesPricingProgram {
             }
             switch (choice) {
                 case 1:
-                    manualInput(sc);
+                    manualInput(sc); // Row 150
                     break;
                 case 2:
-                    minMaxAverage(sc);
+                    minMaxAverage(sc); // Row 191
                     break;
                 case 3:
-                    sortDataSet(sc);
+                    sortDataSet(sc); // Row 219
+                    break;
+                case 4:
+                    findCheapestFourHourWindow(sc); // Row 238
                     break;
                 case 5:
-                    dataSourceSelector();
+                    dataSourceSelector(); // Row 139
                     break;
                 case 6:
-                    printDataSet();
+                    printDataSet(sc); // Row 122
                     break;
                 default:
                     break;
@@ -66,7 +69,7 @@ public class UtilitiesPricingProgram {
         System.out.println("1. Manuell inmatning av elpriser");
         System.out.println("2. Beräkna min, max och medelvärde av elpriser");
         System.out.println("3. Sortera elpriser");
-        System.out.println("4. Beräkna bästa laddnigstid (4t)");
+        System.out.println("4. Beräkna bästa laddningstid (4t)");
         System.out.println("5. Ändra datakälla | Nu används: CSV-fil " + csvIndicator + " | Manuell inmatning "
                 + manualIndicator + " |");
         System.out.println("6. Skriv ut dataunderlag");
@@ -86,7 +89,7 @@ public class UtilitiesPricingProgram {
     private static int[] loadCsvData(String filePath) {
         File file = new File(filePath);
         if (!file.exists()) {
-            System.err.println("File not found: " + filePath);
+            System.err.println("Fil hittas ej: " + filePath);
             return new int[0];
         }
 
@@ -100,10 +103,10 @@ public class UtilitiesPricingProgram {
                         int price = Integer.parseInt(parts[1]);
                         prices.add(price);
                     } catch (NumberFormatException e) {
-                        System.err.println("Error parsing price: " + parts[1]);
+                        System.err.println("Fel vid läsning: " + parts[1]);
                     }
                 } else {
-                    System.err.println("Invalid line format: " + line);
+                    System.err.println("Ogiltit format: " + line);
                 }
             }
         } catch (IOException e) {
@@ -116,9 +119,10 @@ public class UtilitiesPricingProgram {
         return result;
     }
 
-    public static void printDataSet() {
+    public static void printDataSet(Scanner scanner) {
+        System.out.println("====================================");
         if (dataSet == null || dataSet.length == 0) {
-            System.out.println("CSV data is not loaded or empty.");
+            System.out.println("Dataunderlaget hittas ej eller har för lite information.");
             return;
         }
         System.out.println("Dataunderlag:");
@@ -126,6 +130,10 @@ public class UtilitiesPricingProgram {
             System.out.println("Klockan " + String.format("%02d", i) + "-" + String.format("%02d", (i + 1) % 24) + ": "
                     + dataSet[i]);
         }
+        System.out.println("====================================");
+        System.out.println("Tryck på Enter för att återgå till menyn.");
+        scanner.nextLine();
+        scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
     }
 
     public static void dataSourceSelector() {
@@ -201,7 +209,7 @@ public class UtilitiesPricingProgram {
         System.out.println("Beräkning av min, max och medelvärde av elpriser");
         System.out.println("Minsta elpris: " + min);
         System.out.println("Högsta elpris: " + max);
-        System.out.println("Medelvärde: " + average);
+        System.out.printf("Medelvärde: %.2f%n", average);
         System.out.println("====================================");
         System.out.println("Tryck på Enter för att återgå till menyn.");
         scanner.nextLine();
@@ -210,18 +218,47 @@ public class UtilitiesPricingProgram {
 
     public static void sortDataSet(Scanner scanner) {
         if (dataSet == null || dataSet.length == 0) {
-            System.out.println("Data set is not loaded or empty.");
+            System.out.println("Dataunderlaget hittas ej eller har för lite information.");
             return;
         }
         int[] sortedDataSet = Arrays.copyOf(dataSet, dataSet.length);
         Arrays.sort(sortedDataSet);
         System.out.println("====================================");
         System.out.println("Elpriser i stigande ordning:");
-        System.out.println("====================================");
         for (int i = 0; i < sortedDataSet.length; i++) {
             System.out.println("Klockan " + String.format("%02d", i) + "-" + String.format("%02d", (i + 1) % 24) + ": "
                     + sortedDataSet[i]);
         }
+        System.out.println("====================================");
+        System.out.println("Tryck på Enter för att återgå till menyn.");
+        scanner.nextLine();
+        scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
+    }
+
+    public static void findCheapestFourHourWindow(Scanner scanner) {
+        System.out.println("====================================");
+        if (dataSet == null || dataSet.length < 4) {
+            System.out.println("Dataunderlaget hittas ej eller har för lite information.");
+            return;
+        }
+
+        int minSum = Integer.MAX_VALUE;
+        int startIndex = 0;
+
+        for (int i = 0; i <= dataSet.length - 4; i++) {
+            int sum = dataSet[i] + dataSet[i + 1] + dataSet[i + 2] + dataSet[i + 3];
+            if (sum < minSum) {
+                minSum = sum;
+                startIndex = i;
+            }
+        }
+
+        System.out.println("Billigast 4-timmarsfönster:");
+        for (int i = startIndex; i < startIndex + 4; i++) {
+            System.out.println("Klockan " + String.format("%02d", i) + "-" + String.format("%02d", (i + 1) % 24) + ": "
+                    + dataSet[i]);
+        }
+        System.out.println("Genomsnittligt pris: " + (minSum / 4.0));
         System.out.println("====================================");
         System.out.println("Tryck på Enter för att återgå till menyn.");
         scanner.nextLine();
