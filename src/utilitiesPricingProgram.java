@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,6 +35,9 @@ public class UtilitiesPricingProgram {
                     break;
                 case 2:
                     minMaxAverage(sc);
+                    break;
+                case 3:
+                    sortDataSet(sc);
                     break;
                 case 5:
                     dataSourceSelector();
@@ -198,6 +202,26 @@ public class UtilitiesPricingProgram {
         System.out.println("Minsta elpris: " + min);
         System.out.println("Högsta elpris: " + max);
         System.out.println("Medelvärde: " + average);
+        System.out.println("====================================");
+        System.out.println("Tryck på Enter för att återgå till menyn.");
+        scanner.nextLine();
+        scanner.nextLine(); // Wait for the user to press Enter before returning to the menu
+    }
+
+    public static void sortDataSet(Scanner scanner) {
+        if (dataSet == null || dataSet.length == 0) {
+            System.out.println("Data set is not loaded or empty.");
+            return;
+        }
+        int[] sortedDataSet = Arrays.copyOf(dataSet, dataSet.length);
+        Arrays.sort(sortedDataSet);
+        System.out.println("====================================");
+        System.out.println("Elpriser i stigande ordning:");
+        System.out.println("====================================");
+        for (int i = 0; i < sortedDataSet.length; i++) {
+            System.out.println("Klockan " + String.format("%02d", i) + "-" + String.format("%02d", (i + 1) % 24) + ": "
+                    + sortedDataSet[i]);
+        }
         System.out.println("====================================");
         System.out.println("Tryck på Enter för att återgå till menyn.");
         scanner.nextLine();
